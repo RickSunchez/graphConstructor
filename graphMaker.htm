@@ -1,0 +1,162 @@
+<html>
+<script>
+var ctx,
+	pointCounter,
+	HEIGHT = 300,
+	WIDTH  = 400,
+	ACTIVE_POINT,
+	onMove = false,
+	timer,
+	points = new Set();
+window.onload = () => {
+	var canvas = document.getElementById("cnv");
+	canvas.width  = WIDTH;
+	canvas.height = HEIGHT;
+	canvas.onmousedown = getPoint;
+	canvas.onmousemove = dragPoint;
+	canvas.onmouseup   = dragReset;
+	ctx = canvas.getContext("2d");
+	
+	pointCounter = document.getElementById("point_counter");
+}
+
+function update() {
+	var index = 0;
+	for (let p of points) {
+		p.draw();
+		p.set("text", index);
+		index++;
+	}
+		
+	pointCounter.innerText = "Point count: " + points.size;
+}
+
+function addPoint() {
+	var newPoint = new point();
+	points.add(newPoint)
+	
+	update();
+}
+
+function getPoint() {
+	var elem = event.target.getBoundingClientRect(),
+		clickX = event.clientX - elem.left,
+		clickY = event.clientY - elem.top;
+	
+
+	timer = setTimeout(function(){
+		onMove = true;
+		}, 1000)
+}
+function dragPoint() {
+	if (!onMove) return false;
+	
+}
+function dragReset() {
+	clearTimeout(timer);
+	onMove = false;
+}
+function point() {
+	var r = 10, x = 15, y = 15, text = "0";
+	
+	this.draw = () => {
+		ctx.beginPath();
+			ctx.arc(x,y,r,0,2*Math.PI,1);
+			ctx.strokeStyle = "#270089";
+			ctx.fillStyle   = "#e2f9ff";
+			ctx.fill();
+			ctx.stroke();
+		ctx.closePath();
+	}
+	
+	this.set = (param, value) => {
+		switch (param) {
+			case "x":
+				x = parseInt(value);
+				break;
+			case "y":
+				y = parseInt(value);
+				break;
+			case "text":
+				text = value;
+				break;
+			default:
+				console.log("Unexpected parametr name or value")
+				break;
+		}
+	}
+	
+	this.get = (param) => {
+		switch (param) {
+			case "x":
+				return x;
+				break;
+			case "y":
+				return y;
+				break;
+			case "r":
+				return r;
+				break;
+			default:
+				console.log("Unexpected parametr name or value")
+				break;
+		}
+	}
+}
+</script>
+<style>
+* {
+	margin: 0;
+	padding: 0;
+	font: 15px Arial;
+	color: #5a5a5a;
+}
+#main_container {
+	width: 600px;
+	height: 300px;
+	position: relative;
+	left: calc(50% - 600px / 2);
+	top:  calc(50vh - 300px / 2);
+}
+#point_counter {
+	width: calc(600px - 15px);
+	height: 20px;
+	padding-left: 15px;
+	line-height: 20px;
+	position: absolute;
+	top: -20px;
+	background: linear-gradient(to bottom, #eee, #fff);
+}
+nav, canvas {
+	float: left;
+}
+nav {
+	width: 200px;
+	height: 300px;
+}
+.butt {
+	border: solid 2px #bbb;
+	border-radius: 5px;
+	margin: 5px;
+	padding: 10px 5px;
+	text-align: center;
+	user-select: none;
+	cursor: pointer;
+	background: linear-gradient(to bottom, #eee, #fff);
+}
+	.butt:hover {
+		border-color: #5a5a5a;
+	}
+	.butt:active {
+		background: linear-gradient(to top, #eee, #fff)
+	}
+</style>
+<div id="main_container">
+	<div id="point_counter">Point count: 0</div>
+	<nav>
+		<div onclick="addPoint()" class="butt">Add</div>
+	</nav>
+	<canvas id="cnv">
+	</canvas>
+</div>
+</html>
