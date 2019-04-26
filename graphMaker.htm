@@ -1,31 +1,24 @@
 <html>
+<script type="text/javascript" src="onload.js"></script>
 <script>
 var ctx,
 	pointCounter,
-	HEIGHT = 300,
-	WIDTH  = 400,
+	HEIGHT = 400,
+	WIDTH  = 500,
 	ACTIVE_POINT,
 	onMove = false,
 	timer,
 	points = new Set();
-window.onload = () => {
-	var canvas = document.getElementById("cnv");
-	canvas.width  = WIDTH;
-	canvas.height = HEIGHT;
-	canvas.onmousedown = getPoint;
-	canvas.onmousemove = dragPoint;
-	canvas.onmouseup   = dragReset;
-	ctx = canvas.getContext("2d");
-	
-	pointCounter = document.getElementById("point_counter");
-}
 
 function update() {
-	var index = 0;
+	ctx.clearRect(0,0,WIDTH,HEIGHT);
+
 	for (let p of points) {
+		if (p.get("x")-p.get("r") <= 0) p.set("x", p.get("r"));
+		if (p.get("x")+p.get("r") >= WIDTH) p.set("x", WIDTH-p.get("r"));
+		if (p.get("y")-p.get("r") <= 0) p.set("y", p.get("r"));
+		if (p.get("y")+p.get("r") >= HEIGHT) p.set("y", HEIGHT-p.get("r"));
 		p.draw();
-		p.set("text", index);
-		index++;
 	}
 		
 	pointCounter.innerText = "Point count: " + points.size;
@@ -41,23 +34,49 @@ function addPoint() {
 function getPoint() {
 	var elem = event.target.getBoundingClientRect(),
 		clickX = event.clientX - elem.left,
-		clickY = event.clientY - elem.top;
-	
+		clickY = event.clientY - elem.top,
+		onMouse1 = event.button == 0 ? true : false;
 
-	timer = setTimeout(function(){
-		onMove = true;
-		}, 1000)
+	for (let p of points) {
+		var X = p.get("x"),
+			Y = p.get("y"),
+			R = p.get("r"),
+			area = Math.pow(clickX-X, 2) + Math.pow(clickY-Y, 2);
+		if (area < R*R) {
+			if (onMouse1) {
+				ACTIVE_POINT = p;
+				timer = setTimeout(function(){
+					onMove = true;
+					}, 10)
+				break;
+			} else {
+				points.delete(p);
+				update();
+				break;
+			}
+		}
+	}	
+
+	return false;
 }
 function dragPoint() {
 	if (!onMove) return false;
-	
+	var elem = event.target.getBoundingClientRect(),
+		clickX = event.clientX - elem.left,
+		clickY = event.clientY - elem.top;
+
+	ACTIVE_POINT.set("x", clickX);
+	ACTIVE_POINT.set("y", clickY);
+
+	update();
 }
 function dragReset() {
 	clearTimeout(timer);
 	onMove = false;
 }
+
 function point() {
-	var r = 10, x = 15, y = 15, text = "0";
+	var r = 20, x = r+5, y = r+5, text = "0";
 	
 	this.draw = () => {
 		ctx.beginPath();
@@ -110,13 +129,18 @@ function point() {
 	padding: 0;
 	font: 15px Arial;
 	color: #5a5a5a;
+	user-select: none;
 }
 #main_container {
 	width: 600px;
 	height: 300px;
-	position: relative;
-	left: calc(50% - 600px / 2);
-	top:  calc(50vh - 300px / 2);
+	position: absolute;
+	margin: auto;
+	display: inline-block;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
 }
 #point_counter {
 	width: calc(600px - 15px);
@@ -124,11 +148,15 @@ function point() {
 	padding-left: 15px;
 	line-height: 20px;
 	position: absolute;
-	top: -20px;
+	top: -21px;
 	background: linear-gradient(to bottom, #eee, #fff);
 }
 nav, canvas {
 	float: left;
+}
+canvas {
+	border: solid 1px grey;
+	margin: -1px;
 }
 nav {
 	width: 200px;
@@ -151,12 +179,12 @@ nav {
 		background: linear-gradient(to top, #eee, #fff)
 	}
 </style>
-<div id="main_container">
-	<div id="point_counter">Point count: 0</div>
-	<nav>
-		<div onclick="addPoint()" class="butt">Add</div>
-	</nav>
-	<canvas id="cnv">
-	</canvas>
-</div>
+	<div id="main_container">
+		<div id="point_counter">Point count: 0</div>
+		<nav>
+			<div onclick="addPoint()" class="butt">Add</div>
+		</nav>
+		<canvas id="cnv">
+		</canvas>
+	</div>
 </html>
