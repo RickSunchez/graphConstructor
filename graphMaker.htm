@@ -1,14 +1,17 @@
 <html>
 <script type="text/javascript" src="onload.js"></script>
+<script type="text/javascript" src="objects.js"></script>
 <script>
 var ctx,
 	pointCounter,
 	HEIGHT = 400,
 	WIDTH  = 500,
 	ACTIVE_POINT,
+	ACTIVE_ARROW,
 	onMove = false,
 	timer,
 	points = new Set(),
+	arrows = new Set(),
 	delay = false,
 	activeKey,
 	mousePosX,
@@ -31,7 +34,9 @@ function update() {
 		if (p.get("y")+p.get("r") >= HEIGHT) p.set("y", HEIGHT-p.get("r"));
 		p.draw();
 	}
-		
+	for (let a of arrows) {
+		a.draw();
+	}
 	pointCounter.innerText = "Point count: " + points.size;
 }
 
@@ -57,6 +62,8 @@ function getPoint() {
 			if (onMouse1) {
 				ACTIVE_POINT = p;
 				if (activeKey == 17) {
+					ACTIVE_ARROW = new arrow();
+					
 					makeArrow();
 					return false;
 				}
@@ -98,59 +105,9 @@ function dragReset() {
 	onMove = false;
 }
 function makeArrow() {
-	ctx.beginPath()
-		ctx.moveTo(ACTIVE_POINT.get("x"), ACTIVE_POINT.get("y"));
-		ctx.lineTo(mousePosX,mousePosY);
-		ctx.stroke();
-	ctx.closePath();
+	
 }
-function point() {
-	var r = 20, x = r+5, y = r+5, text = "0";
-	
-	this.draw = () => {
-		ctx.beginPath();
-			ctx.arc(x,y,r,0,2*Math.PI,1);
-			ctx.strokeStyle = "#270089";
-			ctx.fillStyle   = "#e2f9ff";
-			ctx.fill();
-			ctx.stroke();
-		ctx.closePath();
-	}
-	
-	this.set = (param, value) => {
-		switch (param) {
-			case "x":
-				x = parseInt(value);
-				break;
-			case "y":
-				y = parseInt(value);
-				break;
-			case "text":
-				text = value;
-				break;
-			default:
-				console.log("Unexpected parametr name or value")
-				break;
-		}
-	}
-	
-	this.get = (param) => {
-		switch (param) {
-			case "x":
-				return x;
-				break;
-			case "y":
-				return y;
-				break;
-			case "r":
-				return r;
-				break;
-			default:
-				console.log("Unexpected parametr name or value")
-				break;
-		}
-	}
-}
+
 </script>
 <style>
 * {
