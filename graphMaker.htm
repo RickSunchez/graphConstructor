@@ -8,7 +8,18 @@ var ctx,
 	ACTIVE_POINT,
 	onMove = false,
 	timer,
-	points = new Set();
+	points = new Set(),
+	delay = false,
+	activeKey,
+	mousePosX,
+	mousePosY;
+
+window.onkeydown = () => {
+	activeKey = event.keyCode;
+}
+window.onkeyup = () => {
+	activeKey = 0;
+}
 
 function update() {
 	ctx.clearRect(0,0,WIDTH,HEIGHT);
@@ -45,13 +56,25 @@ function getPoint() {
 		if (area < R*R) {
 			if (onMouse1) {
 				ACTIVE_POINT = p;
+				if (activeKey == 17) {
+					makeArrow();
+					return false;
+				}
+
 				timer = setTimeout(function(){
 					onMove = true;
+					clearTimeout(timer);
 					}, 10)
 				break;
-			} else {
+			} else if (!delay) {
+				delay = true;
 				points.delete(p);
 				update();
+
+				timer = setTimeout(function(){
+					delay = false;
+					clearTimeout(timer);
+					}, 300)
 				break;
 			}
 		}
@@ -60,21 +83,27 @@ function getPoint() {
 	return false;
 }
 function dragPoint() {
-	if (!onMove) return false;
-	var elem = event.target.getBoundingClientRect(),
-		clickX = event.clientX - elem.left,
-		clickY = event.clientY - elem.top;
+	var elem = event.target.getBoundingClientRect();
+	mousePosX = event.clientX - elem.left;
+	mousePosY = event.clientY - elem.top;
 
-	ACTIVE_POINT.set("x", clickX);
-	ACTIVE_POINT.set("y", clickY);
+	if (!onMove) return false;
+
+	ACTIVE_POINT.set("x", mousePosX);
+	ACTIVE_POINT.set("y", mousePosY);
 
 	update();
 }
 function dragReset() {
-	clearTimeout(timer);
 	onMove = false;
 }
-
+function makeArrow() {
+	ctx.beginPath()
+		ctx.moveTo(ACTIVE_POINT.get("x"), ACTIVE_POINT.get("y"));
+		ctx.lineTo(mousePosX,mousePosY);
+		ctx.stroke();
+	ctx.closePath();
+}
 function point() {
 	var r = 20, x = r+5, y = r+5, text = "0";
 	
