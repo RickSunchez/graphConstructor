@@ -1,6 +1,4 @@
 window.onload = () => {
-	//createBody();
-
 	var canvas         = document.getElementById("cnv"),
 		main_container = document.getElementById("main_container"),
 		point_counter  = document.getElementById("point_counter"),
@@ -12,6 +10,7 @@ window.onload = () => {
 	canvas.onmousemove = dragPoint;
 	canvas.onmouseup   = dragReset;
 	canvas.oncontextmenu = getPoint;
+	canvas.ondblclick = addPoint;
 	ctx = canvas.getContext("2d");
 
 	main_container.style.width  = (WIDTH + 200) + "px";

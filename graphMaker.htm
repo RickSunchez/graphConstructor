@@ -7,7 +7,7 @@ var ctx,
 	HEIGHT = 400,
 	WIDTH  = 500,
 	ACTIVE_POINT,
-	ACTIVE_ARROW,
+	ACTIVE_ARROW = [],
 	onMove = false,
 	timer,
 	points = new Set(),
@@ -15,35 +15,53 @@ var ctx,
 	delay = false,
 	activeKey,
 	mousePosX,
-	mousePosY;
+	mousePosY,
+	k = 1;
 
 window.onkeydown = () => {
 	activeKey = event.keyCode;
 }
 window.onkeyup = () => {
 	activeKey = 0;
+	ACTIVE_ARROW.length = 0;
 }
 
 function update() {
 	ctx.clearRect(0,0,WIDTH,HEIGHT);
+	for (let a of arrows) {
+		a.draw();
+	}
 
 	for (let p of points) {
 		if (p.get("x")-p.get("r") <= 0) p.set("x", p.get("r"));
 		if (p.get("x")+p.get("r") >= WIDTH) p.set("x", WIDTH-p.get("r"));
 		if (p.get("y")-p.get("r") <= 0) p.set("y", p.get("r"));
 		if (p.get("y")+p.get("r") >= HEIGHT) p.set("y", HEIGHT-p.get("r"));
+		reNum();
+		if (p == ACTIVE_POINT) {
+			p.set("bg", "red");
+		} else {
+			p.set("bg", "default");
+		}
+		
 		p.draw();
 	}
-	for (let a of arrows) {
-		a.draw();
-	}
+
 	pointCounter.innerText = "Point count: " + points.size;
 }
 
 function addPoint() {
 	var newPoint = new point();
+
+	if (event.target.tagName == "CANVAS") {
+		newPoint.set("x", mousePosX);
+		newPoint.set("y", mousePosY);
+	}
+
+	ACTIVE_POINT = newPoint;
 	points.add(newPoint)
-	
+	newPoint.set("text", points.size);
+
 	update();
 }
 
@@ -59,14 +77,29 @@ function getPoint() {
 			R = p.get("r"),
 			area = Math.pow(clickX-X, 2) + Math.pow(clickY-Y, 2);
 		if (area < R*R) {
+			ACTIVE_POINT = p;
 			if (onMouse1) {
-				ACTIVE_POINT = p;
 				if (activeKey == 17) {
-					ACTIVE_ARROW = new arrow();
-					
-					makeArrow();
+					ACTIVE_ARROW.push(ACTIVE_POINT);
+
+					if ((ACTIVE_ARROW.length >= 2) && (ACTIVE_ARROW[0] != ACTIVE_ARROW[1])) {
+						var newArrow = new arrow(ACTIVE_ARROW[0], ACTIVE_ARROW[1]);
+
+						for (let a of arrows) {
+							if (a.get("start") == ACTIVE_ARROW[0] || a.get("start") == ACTIVE_ARROW[1]) 
+								if (a.get("end") == ACTIVE_ARROW[0] || a.get("end") == ACTIVE_ARROW[1])
+									return false;
+						}
+						
+						arrows.add(newArrow);
+
+						ACTIVE_ARROW.length = 0;
+						update();
+					} else if (ACTIVE_ARROW.length >= 2) {
+						ACTIVE_ARROW.length = 0;
+					}
 					return false;
-				}
+				} 
 
 				timer = setTimeout(function(){
 					onMove = true;
@@ -75,7 +108,11 @@ function getPoint() {
 				break;
 			} else if (!delay) {
 				delay = true;
-				points.delete(p);
+				for (let a of arrows) {
+					if ((a.get("start") == ACTIVE_POINT) || (a.get("end") == ACTIVE_POINT))
+						arrows.delete(a);
+				}
+				points.delete(ACTIVE_POINT);
 				update();
 
 				timer = setTimeout(function(){
@@ -104,10 +141,13 @@ function dragPoint() {
 function dragReset() {
 	onMove = false;
 }
-function makeArrow() {
-	
+function reNum() {
+	var k = 1;
+	for (let p of points) {
+		p.set("text", k);
+		k++;
+	}
 }
-
 </script>
 <style>
 * {
