@@ -37,13 +37,12 @@ function update() {
 		if (p.get("x")+p.get("r") >= WIDTH) p.set("x", WIDTH-p.get("r"));
 		if (p.get("y")-p.get("r") <= 0) p.set("y", p.get("r"));
 		if (p.get("y")+p.get("r") >= HEIGHT) p.set("y", HEIGHT-p.get("r"));
-		reNum();
+		p.set("bg", "default");
 		if (p == ACTIVE_POINT) {
 			p.set("bg", "red");
-		} else {
-			p.set("bg", "default");
-		}
-		
+		} 
+
+		reNum();
 		p.draw();
 	}
 
@@ -94,10 +93,11 @@ function getPoint() {
 						arrows.add(newArrow);
 
 						ACTIVE_ARROW.length = 0;
-						update();
+						
 					} else if (ACTIVE_ARROW.length >= 2) {
 						ACTIVE_ARROW.length = 0;
 					}
+					update();
 					return false;
 				} 
 

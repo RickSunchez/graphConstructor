@@ -1,13 +1,31 @@
 function arrow(startPoint, endPoint) {
 	var width = 5,
 		sp = startPoint,
-		ep = endPoint;
+		ep = endPoint,
+		dir = false;
 	this.draw = () => {
 		ctx.beginPath();
 			ctx.lineWidth=width;
 			ctx.moveTo(sp.get("x"), sp.get("y"));
 			ctx.lineTo(ep.get("x"), ep.get("y"));
 			ctx.stroke();
+		ctx.closePath();
+		var ANGLE = 0.0,
+			dirBaseX = 0.0,
+			dirBaseY = 0.0;
+
+			
+		if (sp.get("y") > ep.get("y")) {
+			ANGLE = Math.atan((ep.get("x")-sp.get("x"))/(sp.get("y")-ep.get("y")))
+		} else {
+			ANGLE = Math.atan((ep.get("x")-sp.get("x"))/(sp.get("y")-ep.get("y"))) + Math.PI;
+		}
+
+		dirBaseX = ep.get("x") - ep.get("r")*Math.sin(ANGLE);
+		dirBaseY = ep.get("y") + ep.get("r")*Math.cos(ANGLE);
+		ctx.beginPath();
+			ctx.fillStyle = "red";
+			ctx.fillRect(dirBaseX, dirBaseY, 14, 14);
 		ctx.closePath();
 	}
 	this.set = (param, value) => {
@@ -17,6 +35,9 @@ function arrow(startPoint, endPoint) {
 				break;
 			case "end":
 				ep = value;
+				break;
+			case "dir":
+				dir = value;
 				break;
 			default:
 				console.log("Unexpected parametr name or value")
@@ -31,6 +52,9 @@ function arrow(startPoint, endPoint) {
 				break;
 			case "end":
 				return ep;
+				break;
+			case "dir":
+				return dir;
 				break;
 			default:
 				console.log("Unexpected parametr name or value")
