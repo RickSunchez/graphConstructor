@@ -1,3 +1,20 @@
+var ctx,
+	pointCounter,
+	arrowsList,
+	HEIGHT = 400,
+	WIDTH  = 500,
+	ACTIVE_POINT,
+	ACTIVE_ARROW = [],
+	onMove = false,
+	timer,
+	points = new Set(),
+	arrows = new Set(),
+	delay = false,
+	activeKey,
+	mousePosX,
+	mousePosY,
+	k = 1;
+
 window.onload = () => {
 	var canvas         = document.getElementById("cnv"),
 		main_container = document.getElementById("main_container"),
@@ -21,4 +38,5 @@ window.onload = () => {
 	nav.style.height = HEIGHT + "px";
 
 	pointCounter = document.getElementById("point_counter");
+	arrowsList = document.getElementById("arrowsList");
 }
