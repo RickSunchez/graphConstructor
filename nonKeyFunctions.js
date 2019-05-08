@@ -1,5 +1,9 @@
 function update() {
 	ctx.clearRect(0,0,WIDTH,HEIGHT);
+	ctx.beginPath();
+		ctx.fillStyle = "white";
+		ctx.fillRect(0,0,WIDTH,HEIGHT);
+	ctx.closePath();
 	arrowsList.innerText = "";
 
 	for (let a of arrows) {

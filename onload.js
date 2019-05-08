@@ -1,8 +1,9 @@
 var ctx,
+	canvas,
 	pointCounter,
 	arrowsList,
-	HEIGHT = 400,
-	WIDTH  = 500,
+	HEIGHT = 300,
+	WIDTH  = 400,
 	ACTIVE_POINT,
 	ACTIVE_ARROW = [],
 	onMove = false,
@@ -16,8 +17,8 @@ var ctx,
 	k = 1;
 
 window.onload = () => {
-	var canvas         = document.getElementById("cnv"),
-		main_container = document.getElementById("main_container"),
+	canvas = document.getElementById("cnv");
+	var main_container = document.getElementById("main_container"),
 		point_counter  = document.getElementById("point_counter"),
 		nav            = document.getElementsByTagName("nav")[0];
 
@@ -33,7 +34,7 @@ window.onload = () => {
 	main_container.style.width  = (WIDTH + 200) + "px";
 	main_container.style.height = HEIGHT + "px";
 
-	point_counter.style.width  = (WIDTH + 200 - 15) + "px";
+	point_counter.style.width  = (WIDTH + 200 - 14) + "px";
 
 	nav.style.height = HEIGHT + "px";
 
